@@ -9,6 +9,8 @@ import pygame as pg
 from pygame import mixer
 from kivy.core.window import Window
 import math
+from kivy.uix.button import Button
+from kivy.uix.boxlayout import BoxLayout
 
 class PongPaddle(Widget):
     score = NumericProperty(0)
@@ -86,9 +88,13 @@ class PongBomb(Widget):
     velocity_y = NumericProperty(0)
     velocity = ReferenceListProperty(velocity_x, velocity_y)
     anglerocket = NumericProperty(0)
+    distanceToSpaceship = NumericProperty(0)
+    collision = NumericProperty(0)
 
     def move(self):
-        self.pos = Vector(*self.velocity) + self.pos
+        self.pos[0] = self.velocity[0] + self.pos[0]
+        self.pos[1] = self.velocity[1] + self.pos[1]
+        #self.pos = Vector(*self.velocity) + self.pos
 
 class PongGame(Widget):
     ball1 = ObjectProperty(None)
@@ -119,7 +125,7 @@ class PongGame(Widget):
         return True
 
     def soundStage(self):
-        mixer.music.load('stageClear.wav')
+        mixer.music.load('assets/sounds/stageClear.wav')
         mixer.music.play(0)
         return
 
@@ -207,14 +213,25 @@ class PongGame(Widget):
         if mode == 1:
             self.ball2.anglerocket=180-self.ball2.anglerocket
 
+    def eucDistance(self,p,q,r,s):
+        distc = math.sqrt((p-r)*(p-r)+(q-s)*(q-s))
+        #print("distc",distc)
+        return distc
+
     def collisionEngine(self):
-        pass
+        self.bomb3.distanceToSpaceship = self.eucDistance(self.ball2.pos[0],self.ball2.pos[1],self.bomb3.pos[0],self.bomb3.pos[1])
+        if self.bomb3.collision > 0:
+            self.bomb3.collision-=1
+        #print("self.bomb3.distanceToSpaceship",self.bomb3.distanceToSpaceship)
 
     def update(self, dt):
         self.ball1.move()
         self.ball2.move()
         self.bomb3.move()
         self.bullet4.move()
+        self.collisionEngine()
+        if self.bomb3.collision == 0 and self.bomb3.distanceToSpaceship<30:
+            self.bomb3.collision = 60 
 
         # bounce ball off bottom or top
         if (self.ball1.y < self.y) or (self.ball1.top > self.top):
@@ -242,11 +259,6 @@ class PongGame(Widget):
         if self.ball2.x > self.width-100:
             self.ball2.velocity_x *= -1
             self.ball2.direc*=-1
-        '''
-        if self.ball2.x < self.x:
-            self.ball2.x = self.width-150
-        if self.ball2.x > self.width-150:
-            self.ball2.x = self.x'''
 
         if self.ball1.x < self.x:
             self.ball1.velocity_x *= -1
@@ -264,15 +276,19 @@ class PongGame(Widget):
         if touch.x > self.width - self.width / 3:
             self.player2.center_y = touch.y
 
-
 class PongApp(App):
     def build(self):
         pg.init()
+        #superBox = BoxLayout(orientation='vertical')
+        #horizontalBox = BoxLayout(orientation='horizontal')
         game = PongGame()
         game.start_rocket()
         game.serve_ball()
         game.throw_bomb()
         Clock.schedule_interval(game.update, 1.0 / 60.0)
+        #button1 = Button(text="One", size_hint=(1, .2))
+        #superBox.add_widget(game)
+        #superBox.add_widget(button1)
         return game
 
 if __name__ == '__main__':
