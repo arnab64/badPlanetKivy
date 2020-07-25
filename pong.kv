@@ -1,0 +1,106 @@
+#:kivy 1.0.9
+
+<PongBall>:
+    size: 150, 150 
+    canvas:
+        Ellipse:
+            pos: self.pos
+            size: self.size          
+            source: 'assets/images/saturn2.png'
+
+<PongRocket>:
+    size: 100, 100
+    canvas.before:
+        PushMatrix
+        Rotate:
+            axis: 0,0,1
+            angle: self.anglerocket
+            origin: self.center
+    canvas:
+        Ellipse:
+            pos: self.pos
+            size: self.size          
+            source: 'assets/images/spaceship1.png'
+    canvas.after:
+        PopMatrix
+
+<PongBullet>:
+    size: 50, 50
+    canvas.before:
+        PushMatrix
+        Rotate:
+            axis: 0,0,1
+            angle: self.anglebullet
+            origin: self.center
+    canvas:
+        Ellipse:
+            pos: self.pos
+            size: self.size          
+            source: 'assets/images/bullet1.png'
+    canvas.after:
+        PopMatrix
+
+<PongBomb>:
+    size: 75, 75
+    canvas.before:
+        PushMatrix
+        Rotate:
+            axis: 0,0,1
+            origin: self.center
+    canvas:
+        Ellipse:
+            pos: self.pos
+            size: self.size          
+            source: 'assets/images/spaceship.png'
+    canvas.after:
+        PopMatrix
+
+<PongPaddle>:   
+    size: 25, 200
+    canvas:
+        Rectangle:
+            pos:self.pos
+            size:self.size
+
+<PongGame>:
+    ball1: pong_ball1
+    ball2: pong_rocket
+    bomb3: pong_bomb
+    bullet4: pong_bullet
+
+    canvas:
+        Rectangle:
+            pos: self.pos
+            size: self.width, self.height
+            source: 'assets/images/galaxy2.jpg'
+        Color:
+            rgba: 1,1,1,.5
+
+    
+    Label:
+        font_size: 30  
+        center_x: root.width / 4
+        top: root.top - 50
+        text: str("Bad Planet")
+        
+    Label:
+        font_size: 30  
+        center_x: root.width * 5 / 6
+        top: root.top - 50
+        text: str("Coming Soon!")
+    
+    PongBall:
+        id: pong_ball1
+        center: self.parent.center
+
+    PongRocket:
+        id: pong_rocket
+        center: self.parent.center
+
+    PongBullet:
+        id: pong_bullet
+        center: self.parent.center
+
+    PongBomb:
+        id: pong_bomb
+        center: self.parent.center
