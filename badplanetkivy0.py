@@ -55,6 +55,9 @@ class PongBullet(Widget):
         velocity_x = math.sin(self.anglebullet)
         velocity_y = math.cos(self.anglebullet)
 
+        if self.pos[0]==-100 and self.pos[1]==-100:
+            return
+
         self.dictx = { 
             0: (-6,0),
             15: (-5,1),
@@ -86,7 +89,7 @@ class PongBullet(Widget):
         self.pos[0] = self.pos[0] + 2*disp[0]
         self.pos[1] = self.pos[1] - 2*disp[1]
 
-class PongBomb(Widget):
+class PongAlienship(Widget):
     velocity_x = NumericProperty(0)
     velocity_y = NumericProperty(0)
     velocity = ReferenceListProperty(velocity_x, velocity_y)
@@ -100,10 +103,34 @@ class PongBomb(Widget):
         self.pos[1] = self.velocity[1] + self.pos[1]
         #self.pos = Vector(*self.velocity) + self.pos
 
+class PongShark(Widget):
+    velocity_x = NumericProperty(0)
+    velocity_y = NumericProperty(0)
+    rotcenter_x = NumericProperty(0)
+    rotcenter_y = NumericProperty(0)
+    velocity = ReferenceListProperty(velocity_x, velocity_y)
+    angleshark = NumericProperty(0)
+    distanceToSpaceship = NumericProperty(0)
+
+class PongFire(Widget):
+    velocity_x = NumericProperty(0)
+    velocity_y = NumericProperty(0)
+    velocity = ReferenceListProperty(velocity_x, velocity_y)
+
+    def move(self):
+        if self.pos[0]!=-100 and self.pos[1]!=-100:
+            self.pos = Vector(*self.velocity) + self.pos
+
+class PongLightning(Widget):
+    anglelightning = NumericProperty(0)
+
 class PongGame(Widget):
+    updateCounter = 0
     ball1 = ObjectProperty(None)
     spaceship2 = ObjectProperty(None)
-    bomb3 = ObjectProperty(None)
+    alienship3 = ObjectProperty(None)
+    fire6 = ObjectProperty(None)
+    shark7 = ObjectProperty(None)
     #rocket = ObjectProperty(None)
     #player1 = ObjectProperty(None)
     #player2 = ObjectProperty(None)
@@ -126,7 +153,15 @@ class PongGame(Widget):
             self.shoot_bullet()
         elif keycode[1] == "up":
             self.boost_rocket()
+        elif keycode[1] == "e":
+            App.get_running_app().stop()
         return True
+
+    def moveShark(self,uc):
+        xdiff = math.sin(self.shark7.angleshark)
+        ydiff = math.cos(self.shark7.angleshark)
+        self.shark7.pos[0]=self.shark7.pos[0]+xdiff*2
+        self.shark7.pos[1]=self.shark7.pos[1]+ydiff*2
 
     def soundStage(self):
         mixer.music.load('assets/sounds/stageClear.wav')
@@ -143,13 +178,13 @@ class PongGame(Widget):
         mixer.music.play(0)
         return
 
-    def soundCoin(self):
-        mixer.music.load('assets/sounds/coin.wav')
+    def soundLose(self):
+        mixer.music.load('assets/sounds/lose.wav')
         mixer.music.play(0)
         return
 
-    def soundCrash(self):
-        mixer.music.load('assets/sounds/crash.wav')
+    def soundStart(self):
+        mixer.music.load('assets/sounds/start.wav')
         mixer.music.play(0)
         return
  
@@ -159,7 +194,7 @@ class PongGame(Widget):
         return        
 
     def serve_ball(self, vel=(3, 1)):
-        self.ball1.center = self.center
+        self.ball1.center = (self.center[0]-50,self.center[1]+50)
         self.ball1.velocity = vel
         self.soundStage()
 
@@ -167,7 +202,23 @@ class PongGame(Widget):
         self.spaceship2.center = self.center
         self.spaceship2.velocity = vel
         self.spaceship2.anglerocket = 315
-        self.spaceship2.health = 100
+        self.spaceship2.health = 60
+
+    def strikeLightning(self):
+        self.soundLose()
+        self.lightning5.pos = self.alienship3.pos
+        self.lightning5.anglelightning = self.alienship3.angleenemy
+
+    def hitPlanet(self):
+        self.soundStart()
+        self.fire6.pos = self.ball1.pos
+        self.fire6.velocity = self.ball1.velocity  
+
+    def releaseShark(self):
+        self.shark7.pos[0]=350
+        self.shark7.pos[1]=250
+        self.shark7.velocity = (3, 1)
+        self.shark7.angleshark = 0
 
     def boost_rocket(self):
         self.dictx = { 
@@ -210,8 +261,8 @@ class PongGame(Widget):
         self.soundFire()
 
     def throw_bomb(self, vel=(2, 3)):
-        self.bomb3.center = self.center
-        self.bomb3.velocity = vel
+        self.alienship3.center = self.center
+        self.alienship3.velocity = vel
 
     def changeAngle(self, mode):
         if mode == 1:
@@ -223,26 +274,49 @@ class PongGame(Widget):
         return distc
 
     def collisionEngine(self):
-        enemyDistanceToSpaceship = self.eucDistance(self.spaceship2.pos[0],self.spaceship2.pos[1],self.bomb3.pos[0],self.bomb3.pos[1])
-        if enemyDistanceToSpaceship<30 and self.bomb3.collision==0:
+        enemyDistanceToSpaceship = self.eucDistance(self.spaceship2.pos[0],self.spaceship2.pos[1],self.alienship3.pos[0],self.alienship3.pos[1])
+        if enemyDistanceToSpaceship<75 and self.alienship3.collision==0:
+            self.alienship3.collision = 60
             self.spaceship2.health-=10
-        if self.bomb3.collision > 0:
-            self.bomb3.collision-=1
+            self.strikeLightning()
+            self.alienship3.velocity_x *= -1
+            self.alienship3.velocity_y *= -1
+            self.spaceship2.velocity_x *= -1
+            self.spaceship2.velocity_y *= -1
+
+        if self.alienship3.collision > 0:
+            self.alienship3.collision-=1
+            if self.alienship3.collision==0:
+                #self.lightning5.pos[0]= -100
+                #self.lightning5.pos[1]= -100
+                self.lightning5.pos=(-100,-100)
+
         self.bullet4.distanceToPlanet = self.eucDistance(self.bullet4.pos[0],self.bullet4.pos[1],self.ball1.pos[0],self.ball1.pos[1])
         if self.bullet4.collision > 0:
             self.bullet4.collision-=1
+            if self.bullet4.collision==0:
+                self.fire6.pos=(-100,-100)
         #print("self.bomb3.distanceToSpaceship",self.bomb3.distanceToSpaceship)
 
     def update(self, dt):
         self.ball1.move()
         self.spaceship2.move()
-        self.bomb3.move()
+        self.alienship3.move()
         self.bullet4.move()
+        #self.lightning5.move()
+        self.fire6.move()
         self.collisionEngine()
-        self.bomb3.angleenemy = (self.bomb3.angleenemy+1)%360
+
+        self.alienship3.angleenemy = (self.alienship3.angleenemy+1)%360
+        self.updateCounter=self.updateCounter+1
+        if self.updateCounter==25:
+            self.updateCounter = 0
+            self.shark7.angleshark = (self.shark7.angleshark+1)%360 
+        self.moveShark(self.updateCounter)
         '''if self.bomb3.collision == 0 and self.bomb3.distanceToSpaceship<30:
             self.bomb3.collision = 60'''
-        if self.bullet4.collision == 0 and self.bullet4.distanceToPlanet<70:
+        if self.bullet4.collision == 0 and self.bullet4.distanceToPlanet<40:
+            self.hitPlanet()
             self.bullet4.collision = 60
             self.spaceship2.score+=10
 
@@ -250,6 +324,9 @@ class PongGame(Widget):
         # bounce ball off bottom or top
         if (self.ball1.y < self.y) or (self.ball1.top > self.top):
             self.ball1.velocity_y *= -1
+
+        if (self.shark7.y < self.y) or (self.shark7.top > self.top):
+            self.shark7.velocity_y *= -1
 
         '''if (self.ball2.y < self.y) or (self.ball2.top > self.top):
             self.ball2.velocity_y *= -1
@@ -260,8 +337,8 @@ class PongGame(Widget):
             self.spaceship2.top = 100
         #print("ball2y,ball2top,y,top",self.ball2.y,self.ball2.top,self.y,self.top)
             
-        if (self.bomb3.y < self.y) or (self.bomb3.top > self.top):
-            self.bomb3.velocity_y *= -1
+        if (self.alienship3.y < self.y) or (self.alienship3.top > self.top):
+            self.alienship3.velocity_y *= -1
 
         if self.spaceship2.anglerocket<0:
             self.spaceship2.anglerocket=self.spaceship2.anglerocket+360
@@ -273,13 +350,16 @@ class PongGame(Widget):
 
         if self.ball1.x < self.x:
             self.ball1.velocity_x *= -1
-        if self.ball1.x > self.width-150:
+        if self.ball1.x > self.width-100:
             self.ball1.velocity_x *= -1
 
-        if self.bomb3.x < self.x:
-            self.bomb3.velocity_x *= -1
-        if self.bomb3.x > self.width-75:
-            self.bomb3.velocity_x *= -1
+        if self.alienship3.x < self.x:
+            self.alienship3.velocity_x *= -1
+        if self.alienship3.x > self.width-75:
+            self.alienship3.velocity_x *= -1
+        if self.spaceship2.health==0:
+            print("GAME OVER! Your score was",self.spaceship2.score)
+            App.get_running_app().stop()
 
     def on_touch_move(self, touch):
         if touch.x < self.width / 3:
@@ -296,6 +376,7 @@ class PongApp(App):
         game.start_rocket()
         game.serve_ball()
         game.throw_bomb()
+        game.releaseShark()
         Clock.schedule_interval(game.update, 1.0 / 60.0)
         #button1 = Button(text="One", size_hint=(1, .2))
         #superBox.add_widget(game)

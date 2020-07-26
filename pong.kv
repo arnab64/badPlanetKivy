@@ -1,7 +1,7 @@
 #:kivy 1.0.9
 
 <PongBall>:
-    size: 150, 150 
+    size: 100, 100 
     canvas:
         Ellipse:
             pos: self.pos
@@ -40,7 +40,7 @@
     canvas.after:
         PopMatrix
 
-<PongBomb>:
+<PongAlienship>:
     size: 75, 75
     canvas.before:
         PushMatrix
@@ -56,6 +56,38 @@
     canvas.after:
         PopMatrix
 
+<PongFire>:
+    size: 75, 75
+    canvas:
+        Ellipse:
+            pos: self.pos
+            size: self.size          
+            source: 'assets/images/fire.png'
+
+<PongLightning>:
+    size: 75, 75
+    canvas.before:
+        PushMatrix
+        Rotate:
+            axis: 0,0,1
+            origin: self.center
+            angle: self.anglelightning
+    canvas:
+        Ellipse:
+            pos: self.pos
+            size: self.size          
+            source: 'assets/images/explosion2.png'
+    canvas.after:
+        PopMatrix
+
+<PongShark>:
+    size: 75, 75
+    canvas:
+        Ellipse:
+            pos: (self.pos[0]+300,self.pos[1]+50)
+            size: self.size          
+            source: 'assets/images/shark.png'
+
 <PongPaddle>:   
     size: 25, 200
     canvas:
@@ -66,8 +98,11 @@
 <PongGame>:
     ball1: pong_ball1
     spaceship2: pong_rocket
-    bomb3: pong_bomb
+    alienship3: pong_alienship
     bullet4: pong_bullet
+    lightning5: pong_lightning
+    fire6: pong_fire
+    shark7: pong_shark
 
     canvas:
         Rectangle:
@@ -78,15 +113,15 @@
             rgba: 1,1,1,.5
     Label:
         font_size: 30  
-        center_x: root.width / 4
+        center_x: root.width / 6
         top: root.top - 50
-        text: "Score: "+str(self.parent.spaceship2.score)
+        text: "BadPlanet"
         
     Label:
         font_size: 30  
-        center_x: root.width * 5 / 6
+        center_x: root.width * 4 / 5
         top: root.top - 50
-        text: "Health: " + str(self.parent.spaceship2.health)
+        text: "Score:"+str(self.parent.spaceship2.score) + " / Health:" + str(self.parent.spaceship2.health)
 
     PongBall:
         id: pong_ball1
@@ -100,6 +135,18 @@
         id: pong_bullet
         center: self.parent.center
 
-    PongBomb:
-        id: pong_bomb
+    PongAlienship:
+        id: pong_alienship
+        center: self.parent.center
+
+    PongLightning:
+        id: pong_lightning
+        center: self.parent.center
+
+    PongFire:
+        id: pong_fire
+        center: self.parent.center
+
+    PongShark:
+        id: pong_shark
         center: self.parent.center
