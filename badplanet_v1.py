@@ -11,6 +11,7 @@ from kivy.core.window import Window
 import math
 from kivy.uix.button import Button
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.gridlayout import GridLayout
 
 class PongPaddle(Widget):
     score = NumericProperty(0)
@@ -112,8 +113,10 @@ class PongShark(Widget):
     velocity = ReferenceListProperty(velocity_x, velocity_y)
     angleshark = NumericProperty(0)
     distanceToSpaceship = NumericProperty(0)
-    gameActive = 1
-    label = StringProperty
+    #labelMainText = Property('Hello world')
+    labelMainText = ObjectProperty(None, allownone=True)
+    labelMainSize = NumericProperty(0)
+    labelMainPosition = NumericProperty(0)
 
 class PongFire(Widget):
     velocity_x = NumericProperty(0)
@@ -231,6 +234,9 @@ class PongGame(Widget):
         self.shark7.pos[1]=250
         self.shark7.velocity = (3, 1)
         self.shark7.angleshark = 0
+        self.shark7.labelMainSize = 25
+        self.shark7.labelMainPosition = 100
+        self.shark7.labelMainText = "Bad Planet!"
 
     def boost_rocket(self):
         self.dictx = { 
@@ -285,6 +291,12 @@ class PongGame(Widget):
         #print("distc",distc)
         return distc
 
+    def disappearEverything(self):
+        self.shark7.pos=(-100,100)
+        self.ball1.pos=(-100,100)
+        self.spaceship2.pos=(-100,100)
+        self.alienship3.pos=(-100,100)
+
     def collisionEngine(self):
         #compute distance between spaceship and alienship
         enemyDistanceToSpaceship = self.eucDistance(self.spaceship2.pos[0],self.spaceship2.pos[1],self.alienship3.pos[0],self.alienship3.pos[1])
@@ -303,7 +315,7 @@ class PongGame(Widget):
                 self.lightning5.pos=(-100,-100)
 
         #compute distance between bullet and planet
-        self.bullet4.distanceToPlanet = self.eucDistance(self.bullet4.pos[0],self.bullet4.pos[1],self.ball1.pos[0],self.ball1.pos[1])
+        self.bullet4.distanceToPlanet = self.eucDistance(self.bullet4.center[0],self.bullet4.center[1],self.ball1.center[0],self.ball1.center[1])
         if self.bullet4.collision > 0:
             self.bullet4.collision-=1
             if self.bullet4.collision==0:
@@ -385,9 +397,11 @@ class PongGame(Widget):
         if self.alienship3.x > self.width-75:
             self.alienship3.velocity_x *= -1
         if self.spaceship2.health==0:
-            self.shark7.gameActive=0
-            print("GAME OVER! Your score was",self.spaceship2.score)
-            App.get_running_app().stop()
+            self.shark7.labelMainSize = 50
+            self.shark7.labelMainPosition = 500
+            self.shark7.labelMainText = "GAME OVER!! \n You Scored "+str(self.spaceship2.score) 
+            #self.disappearEverything()
+            #App.get_running_app().stop()
 
     def on_touch_move(self, touch):
         if touch.x < self.width / 3:
@@ -398,17 +412,12 @@ class PongGame(Widget):
 class PongApp(App):
     def build(self):
         pg.init()
-        #superBox = BoxLayout(orientation='vertical')
-        #horizontalBox = BoxLayout(orientation='horizontal')
         game = PongGame()
         game.start_rocket()
         game.serve_ball()
         game.throw_bomb()
         game.releaseShark()
         Clock.schedule_interval(game.update, 1.0 / 60.0)
-        #button1 = Button(text="One", size_hint=(1, .2))
-        #superBox.add_widget(game)
-        #superBox.add_widget(button1)
         return game
 
 if __name__ == '__main__':

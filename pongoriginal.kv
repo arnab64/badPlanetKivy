@@ -95,12 +95,6 @@
             pos:self.pos
             size:self.size
 
-<PageLayout>:
-    BoxLayout:
-        Button: 
-            text: 'GFG :)'
-            on_press: print("This Is The First Page")
-    
 <PongGame>:
     ball1: pong_ball1
     spaceship2: pong_rocket
@@ -109,8 +103,7 @@
     lightning5: pong_lightning
     fire6: pong_fire
     shark7: pong_shark
-    cols: 2  
-    
+
     canvas:
         Rectangle:
             pos: self.pos
@@ -119,15 +112,15 @@
         Color:
             rgba: 1,1,1,.5
     Label:
-        font_size: self.parent.shark7.labelMainSize
-        center_x: self.parent.shark7.labelMainPosition
+        font_size: 30  
+        center_x: root.width / 8
         top: root.top - 50
-        text: str(self.parent.shark7.labelMainText)
+        text: "BadPlanet"
         
     Label:
         font_size: 20  
         center_x: root.width * 4 / 5
-        top: root.height *1/8
+        top: root.top - 50
         text: "Score:"+str(self.parent.spaceship2.score) + " / Health:" + str(self.parent.spaceship2.health)
 
     PongBall:
