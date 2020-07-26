@@ -298,8 +298,6 @@ class PongGame(Widget):
         if self.alienship3.collision > 0:
             self.alienship3.collision-=1
             if self.alienship3.collision==0:
-                #self.lightning5.pos[0]= -100
-                #self.lightning5.pos[1]= -100
                 self.lightning5.pos=(-100,-100)
 
         #compute distance between bullet and planet
@@ -316,6 +314,9 @@ class PongGame(Widget):
             if self.bullet4.collisionAlienship!=0:
                 self.alienship3.pos=(-100,-100)
                 self.throw_bomb()
+
+        #ninjaDistance = self.eucDistance(self.shark7.pos[0],self.shark7.pos[1],self.spaceship2.pos[0],self.spaceship2.pos[1])
+
         #print("self.bomb3.distanceToSpaceship",self.bomb3.distanceToSpaceship)
 
     def update(self, dt):
@@ -323,7 +324,6 @@ class PongGame(Widget):
         self.spaceship2.move()
         self.alienship3.move()
         self.bullet4.move()
-        #self.lightning5.move()
         self.fire6.move()
         self.collisionEngine()
 
