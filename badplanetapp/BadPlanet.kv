@@ -1,0 +1,156 @@
+#:kivy 1.0.9
+
+<PongPlanet>:
+    size: 250, 250 
+    canvas:
+        Ellipse:
+            pos: self.pos
+            size: self.size          
+            source: 'assets/images/saturn2.png'
+
+<PongSpaceship>:
+    size: 250, 250
+    canvas.before:
+        PushMatrix
+        Rotate:
+            axis: 0,0,1
+            angle: self.anglerocket
+            origin: self.center
+    canvas:
+        Ellipse:
+            pos: self.pos
+            size: self.size          
+            source: 'assets/images/spaceship1.png'
+    canvas.after:
+        PopMatrix
+
+<PongBullet>:
+    size: 150, 150
+    canvas.before:
+        PushMatrix
+        Rotate:
+            axis: 0,0,1
+            angle: self.anglebullet
+            origin: self.center
+    canvas:
+        Ellipse:
+            pos: self.pos
+            size: self.size          
+            source: 'assets/images/bullet1.png'
+    canvas.after:
+        PopMatrix
+
+<PongAlienship>:
+    size: 200, 200
+    canvas.before:
+        PushMatrix
+        Rotate:
+            axis: 0,0,1
+            origin: self.center
+            angle: self.angleenemy
+    canvas:
+        Ellipse:
+            pos: (self.pos[0],self.pos[1])
+            size: self.size          
+            source: 'assets/images/spaceship.png'
+    canvas.after:
+        PopMatrix
+
+<PongFire>:
+    size: 100, 100
+    canvas:
+        Ellipse:
+            pos: self.pos
+            size: self.size          
+            source: 'assets/images/fire.png'
+
+<PongLightning>:
+    size: 75, 75
+    canvas.before:
+        PushMatrix
+        Rotate:
+            axis: 0,0,1
+            origin: self.center
+            angle: self.anglelightning
+    canvas:
+        Ellipse:
+            pos: self.pos
+            size: self.size          
+            source: 'assets/images/explosion2.png'
+    canvas.after:
+        PopMatrix
+
+<PongShark>:
+    size: 600, 300
+    canvas:
+        Ellipse:
+            pos: (self.pos[0]+300,self.pos[1]+50)
+            size: self.size          
+            source: 'assets/images/ironman.png'
+
+<PongPaddle>:   
+    size: 25, 200
+    canvas:
+        Rectangle:
+            pos:self.pos
+            size:self.size
+
+<PageLayout>:
+    BoxLayout:
+        Button: 
+            text: 'GFG :)'
+            on_press: print("This Is The First Page")
+    
+<BadPlanetGame>:
+    ball1: pong_ball1
+    spaceship2: pong_rocket
+    alienship3: pong_alienship
+    bullet4: pong_bullet
+    lightning5: pong_lightning
+    fire6: pong_fire
+    shark7: pong_shark
+    
+    canvas:
+        Rectangle:
+            pos: self.pos
+            size: self.width, self.height
+            source: 'assets/images/spaceman.jpg'
+        Color:
+            rgba: 1,1,1,.5
+    Label:
+        font_size: self.parent.shark7.labelMainSize
+        pos: (230,230)
+        text: str(self.parent.shark7.labelMainText)
+        
+    Label:
+        font_size: 20  
+        pos: (200,200)
+        text: "Score:"+str(self.parent.spaceship2.score) + " / Health:" + str(self.parent.spaceship2.health)
+
+    PongPlanet:
+        id: pong_ball1
+        center: self.parent.center
+
+    PongSpaceship:
+        id: pong_rocket
+        center: self.parent.center
+
+    PongBullet:
+        id: pong_bullet
+        center: self.parent.center
+
+    PongAlienship:
+        id: pong_alienship
+        center: self.parent.center
+
+    PongLightning:
+        id: pong_lightning
+        center: self.parent.center
+
+    PongFire:
+        id: pong_fire
+        center: self.parent.center
+
+    PongShark:
+        id: pong_shark
+        center: self.parent.center
