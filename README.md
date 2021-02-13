@@ -1,6 +1,6 @@
 # BadPlanet on Kivy
 
-A new edition of classic game Asteroids controlled by gestures. Or Keyboard!
+A new edition of classic game Asteroids controlled by gestures, on a live OpenCV camera feed. Or Keyboard works too!
 
 ![](assets/images/badplanet.png)
 
